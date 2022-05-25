@@ -25,14 +25,16 @@
   <tbody>
     <tr v-for="(task, index) in tasks" :key="index">
       <th>{{task.name}}</th>
-      <td>{{task.status}}</td>
+      <td style="width: 120px"><span @click="changeStatus(index)" class="pointer">{{firstCharUpper(task.status)}}
+        </span>
+        </td>
       <td>
-        <div class="text-center">
+        <div class="text-center" @click="editTask(index)">
           <span class="fa fa-pen"></span>
         </div>
       </td>
       <td>
-        <div class="text-center">
+        <div class="text-center" @click="deleteTask(index)">
           <span class="fa fa-trash"></span>
         </div>
       </td>
@@ -55,6 +57,8 @@ export default {
 data(){
   return{
     task: '',
+    editedTask: null,
+    availableStatuses: ['to-do','in-progress','finished'],
     tasks: [
       {
         name: 'Steal bananas',
@@ -71,7 +75,31 @@ data(){
 methods: {
   submitTask(){
     if(this.task.length === 0) return;
-    this.tasks.push({name: this.task, status: 'to-do' })
+
+    if(this.editedTask === null){
+
+    this.tasks.push({name: this.task, status: 'to-do' });
+    }else{
+      this.tasks[this.editedTask].name = this.task;
+      this.editedTask = null;
+    }
+
+    this.task = '';
+},
+deleteTask(index){
+  this.tasks.splice(index, 1);
+},
+editTask(index){
+  this.task = this.tasks[index].name;
+  this.editedTask = index;
+},
+changeStatus(index){
+  let newIndex = this.availableStatuses.indexOf(this.tasks[index].status);
+  if(++newIndex > 2) newIndex = 0;
+  this.tasks[index].status = this.availableStatuses[newIndex];
+},
+firstCharUpper(str){
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 }
 
@@ -79,5 +107,7 @@ methods: {
 </script>
 
 <style>
-
+.pointer{
+  cursor: 'pointer'
+}
 </style>
